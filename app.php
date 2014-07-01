@@ -17,9 +17,28 @@
   <script src="https://s3.amazonaws.com/codiqa-cdn/codiqa.ext.js"></script>
 
   <script src="script.js"></script>
-
 </head>
 <body>
+  <?php
+   
+    /** Tentativa de conexão ao banco */
+    $endereco = 'localhost';
+    $mysql_user = 'root';
+    $mysql_password = '';
+    $link = mysql_connect( $endereco, $mysql_user, $mysql_password);
+    if (!$link) {
+        die('Não foi possível conectar: ' . mysql_error());
+    }
+
+    
+    mysql_close($link);
+  ?>
+  
+  
+  
+  
+  
+  
 
 <!-- HOME -->
 <div data-role="page" data-control-title="Home" id="page1">
