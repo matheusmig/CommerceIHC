@@ -21,16 +21,37 @@
 <body>
   <?php
    
-    /** Tentativa de conexão ao banco */
-    $endereco = 'localhost';
-    $mysql_user = 'root';
-    $mysql_password = '';
-    $link = mysql_connect( $endereco, $mysql_user, $mysql_password);
-    if (!$link) {
-        die('Não foi possível conectar: ' . mysql_error());
-    }
+    /** Constantes para conexão ao banco */
+    define(ENDERECO, 'localhost');
+    define(MYSQL_USER, 'root');
+    define(MYSQL_PASSWORD, '');
 
+    class BancoDeDados{
     
+        public function InserirProduto($tipo = 'null', $nome = 'null', $foto = 'null', $marca = 'null',
+                           $kcal = 'null', $proteina = 'null', $carboidrato = 'null', $lipidio = 'null',
+                           $fibra = 'null', $sodio = 'null', $acucar = 'null', $gluten = 'null', $componentesAlergicos = 'null'){
+                           
+            $link = mysql_connect( ENDERECO, MYSQL_USER, MYSQL_PASSWORD);
+            if (!$link) {
+                die('Não foi possível conectar: ' . mysql_error());
+            }               
+                           
+            $sql = "INSERT INTO produtos
+                   (TipoProduto, Nome, Foto, Marca, Kcal, Proteina, Carboidrato, Lipidio, Fibra, Sodio, Acucar, Gluten, ComponentesAlergicos)
+                    VALUES ('$tipo','$nome', '$foto','$marca','$kcal','$proteina','$carboidrato','$lipidio','$fibra','$sodio','$acucar','$gluten','$componentesAlergicos' )";
+            mysql_select_db('ihc');
+            echo $sql;
+            $retval = mysql_query( $sql, $link );
+            if(! $retval )
+            {
+              die('Could not enter data: ' . mysql_error());
+            }              
+        }
+    }
+    
+    $bd = new BancoDeDados();
+    $bd->InserirProduto("a","a","a","a","a","a","a","a","a","a","a","a","a","a");
     mysql_close($link);
   ?>
   
