@@ -10,13 +10,14 @@
   <link href="https://s3.amazonaws.com/codiqa-cdn/codiqa.ext.css" rel="stylesheet">
   <link href="https://s3.amazonaws.com/codiqa-cdn/mobile/1.4.2/jquery.mobile-1.4.2.css" rel="stylesheet">
 
-  <link rel="stylesheet" type="text/css" href="style.css">
-
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
   <script src="https://s3.amazonaws.com/codiqa-cdn/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
   <script src="https://s3.amazonaws.com/codiqa-cdn/codiqa.ext.js"></script>
 
-  <script src="script.js"></script>
+  <link rel="stylesheet" type="text/css" href="jquery.mobile-1.4.3.css">
+  <script src="jquery.mobile-1.4.3.js"></script>
+
+  <? /*<script src="funcoes.js"></script> */ ?>
 </head>
 <body>
   <?php
@@ -30,28 +31,64 @@
     
         public function InserirProduto($tipo = 'null', $nome = 'null', $foto = 'null', $marca = 'null',
                            $kcal = 'null', $proteina = 'null', $carboidrato = 'null', $lipidio = 'null',
-                           $fibra = 'null', $sodio = 'null', $acucar = 'null', $gluten = 'null', $componentesAlergicos = 'null'){
-                           
+                           $fibra = 'null', $sodio = 'null', $acucar = 'null', $gluten = 'null', $componentesAlergicos = 'null',
+                           $preco = 'null', $mercados = 'null'){
+                           //inserir valor e supermercados
             $link = mysql_connect( ENDERECO, MYSQL_USER, MYSQL_PASSWORD);
             if (!$link) {
                 die('Não foi possível conectar: ' . mysql_error());
-            }               
-                           
+            }
+
+            //encodando imagem:
+            $contentFoto = file_get_contents($foto); $hex_string_foto = base64_encode($contentFoto);
+
+
             $sql = "INSERT INTO produtos
-                   (TipoProduto, Nome, Foto, Marca, Kcal, Proteina, Carboidrato, Lipidio, Fibra, Sodio, Acucar, Gluten, ComponentesAlergicos)
-                    VALUES ('$tipo','$nome', '$foto','$marca','$kcal','$proteina','$carboidrato','$lipidio','$fibra','$sodio','$acucar','$gluten','$componentesAlergicos' )";
+                   (TipoProduto, Nome, Foto, Marca, Kcal, Proteina, Carboidrato, Lipidio, Fibra, Sodio, Acucar, Gluten, ComponentesAlergicos, Valor, Supermercados)
+                   VALUES ('$tipo','$nome', '$hex_string_foto','$marca','$kcal','$proteina','$carboidrato','$lipidio','$fibra','$sodio','$acucar','$gluten','$componentesAlergicos','$valor','$mercados' )";
             mysql_select_db('ihc');
-            echo $sql;
+            //echo $sql;
             $retval = mysql_query( $sql, $link );
             if(! $retval )
             {
               die('Could not enter data: ' . mysql_error());
             }              
         }
+
+        public function BuscarProdutoPorNome ($nome){
+            $link = mysql_connect( ENDERECO, MYSQL_USER, MYSQL_PASSWORD);
+            if (!$link) {
+                die('Não foi possível conectar: ' . mysql_error());
+            }
+
+            $sql = "SELECT TipoProduto as TipoProduto, Nome, Foto, Marca, Kcal, Proteina, Carboidrato, Lipidio, Fibra, Sodio, Acucar, Gluten, ComponentesAlergicos, Valor, Supermercados 
+                    FROM produtos
+                    WHERE Nome like '$nome'";
+            mysql_select_db('ihc');
+            $retval = mysql_query( $sql, $link );
+            if(! $retval )
+            {
+              die('Could not enter data: ' . mysql_error());
+            }
+            $result = mysql_fetch_assoc($retval);
+            return $result;
+        }
     }
     
     $bd = new BancoDeDados();
-    $bd->InserirProduto("a","a","a","a","a","a","a","a","a","a","a","a","a","a");
+    
+    // ALIMENTAR O BANCO
+  /*  $bd->InserirProduto("Salgadinho","Doritos","http://www.pepsico.com.br/resize/521/360/doritos_queijo_nacho.jpg","Elma Chips","125","1.9","14","","1.1","182","","true","milho transgênico","2.99","Zaffari, Carrefour");
+    $bd->InserirProduto("Salgadinho","Baconzitos","http://www.pepsico.com.br/resize/521/360/baconzitos%20(1).jpg","Elma Chips","100","1","11","","0.9","230","","true","milho transgênico","3.15","Zaffari, Nacional");
+    $bd->InserirProduto("Salgadinho","Ruffles","http://www.pepsico.com.br/resize/521/360/ruffles_regular.jpg","Elma Chips","134","1,5","11","","1","137","","true","milho transgenico","2.5","Carrefour, Nacional");
+    $bd->InserirProduto("Salgadinho","Pingo D oro","http://www.pepsico.com.br/resize/521/360/pingodouro.jpg","Elma Chips","129","2.4","14","7.2","0.6","397","","true","milho trasgenico","1.99","Carrefour, Nacional");
+    $bd->InserirProduto("Salgadinho","Cheetos","http://www.pepsico.com.br/resize/521/360/cheetos-lua.jpg","Elma Chips","121","1.5","17","5.2","0","158","","true","milho trasgenico","2.80","Nacional");
+    $bd->InserirProduto("Salgadinho","Fandangos","http://www.pepsico.com.br/resize/521/360/fandangos-queijo%20(2).jpg","Elma Chips","114","1.8","17","4.2","0.9","157","","true","milho trasgenico","2.20","Carrefour, Nacional");
+    $bd->InserirProduto("Salgadinho","Yokitos Conchinha","http://www.comperdelivery.com.br/Imagens/produtos/56/1016156_Detalhes.jpg","Yokitos","132","1.5","12","8.6","0.9","478","","true","milho trasgenico","1.69","Carrefour, Nacional, Zaffari");
+    $bd->InserirProduto("Salgadinho","Pringles","http://2.bp.blogspot.com/_VpW8JiTI9u8/RutQtrjSJ6I/AAAAAAAABNQ/180Oz0FBmqA/s1600/pringlesPack_IL.jpg","Pringles","139","1.2","12","9.1","0.8","151","","true","milho trasgenico","1.99","Zaffari");
+*/
+    print_r($bd->BuscarProdutoPorNome("Doritos"));
+
     mysql_close($link);
   ?>
   
@@ -353,8 +390,10 @@
         <div class="ui-grid-a">
             <div class="ui-block-a">
                 <div class="ui-field-contain" data-controltype="searchinput">
-                    <input name="" id="searchinput3" placeholder="" value="Pesto" type="search"
-                    data-mini="true">
+                    <form name="" id="formProcuraProduto">
+                        <input name="" id="inputProcuraProduto" placeholder="" value="Pesto" type="search"
+                        data-mini="true">
+                    </form>
                 </div>
             </div>
             <div class="ui-block-b">
